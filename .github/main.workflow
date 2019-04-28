@@ -1,6 +1,6 @@
 workflow "Check" {
   on = "push"
-  resolves = [ "Build", "Test" ]
+  resolves = ["Build", "Test"]
 }
 
 workflow "Publish" {
@@ -35,7 +35,7 @@ action "Test" {
 
 action "Tag Check: version" {
   uses = "actions/bin/filter@master"
-  needs = [ "Build", "Test" ]
+  needs = ["Build", "Test"]
   args = "tag v/*"
 }
 
@@ -49,6 +49,7 @@ action "NPM Push" {
   uses = "actions/npm@master"
   needs = "NPM Pack"
   args = "publish *.tgz --tag=next"
+  secrets = ["NPM_AUTH_TOKEN"]
 }
 
 action "Tag Check: latest" {
@@ -60,5 +61,5 @@ action "NPM Latest" {
   uses = "actions/npm@master"
   needs = "Tag Check: latest"
   args = "dist-tag add buffer-pond@${npm run -s version} latest"
+  secrets = ["NPM_AUTH_TOKEN"]
 }
-
