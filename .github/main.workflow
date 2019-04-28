@@ -60,6 +60,6 @@ action "Tag Check: latest" {
 action "NPM Latest" {
   uses = "actions/npm@master"
   needs = "Tag Check: latest"
-  args = "dist-tag add buffer-pond@${npm run -s version} latest"
+  args = "dist-tag add buffer-pond@${npm run -s versions} latest"
   secrets = ["NPM_AUTH_TOKEN"]
 }

@@ -8,7 +8,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c && tsc --emitDeclarationOnly",
-    "version": "node -p \"require('./package.json').version\"",
+    "versions": "node -p \"require('./package.json').version\"",
     "test": "jest --ci --coverage"
   },
   "keywords": [
