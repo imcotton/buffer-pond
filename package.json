@@ -1,0 +1,38 @@
+{
+  "name": "buffer-pond",
+  "version": "0.1.0",
+  "description": "Slicing buffered chunks in advanced.",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "browser": "dist/bundle.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rollup -c && tsc --emitDeclarationOnly",
+    "version": "node -p \"require('./package.json').version\"",
+    "test": "jest --ci --coverage"
+  },
+  "keywords": [
+    "buffer",
+    "async"
+  ],
+  "author": "Cotton Hou <himcotton@gmail.com>",
+  "repository": "github:imcotton/buffer-pond",
+  "homepage": "https://github.com/imcotton/buffer-pond#readme",
+  "bugs": {
+    "url": "https://github.com/imcotton/buffer-pond/issues"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@typed/curry": "^1.0.1",
+    "@types/jest": "^24.0.11",
+    "@types/node": "^10.14.5",
+    "jest": "^24.7.1",
+    "jest-junit": "^6.3.0",
+    "rollup": "^1.10.1",
+    "rollup-plugin-terser": "^4.0.4",
+    "rollup-plugin-typescript": "^1.0.1",
+    "ts-jest": "^24.0.2",
+    "tslib": "^1.9.3",
+    "typescript": "^3.4.5"
+  }
+}
