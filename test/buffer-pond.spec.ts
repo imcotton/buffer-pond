@@ -107,6 +107,8 @@ describe('BufferPond', () => {
 
     describe('Promise', () => {
 
+        jest.useFakeTimers();
+
         let pond: ReturnType<typeof BufferPond>;
 
 
@@ -132,6 +134,8 @@ describe('BufferPond', () => {
                 pond.feed(Helper.buffer('11-22-33-44-55-66'));
             }, 100);
 
+            jest.runAllTimers();
+
             Helper.equal('11-22', await pond.read(2));
             Helper.equal('33-44-55', await pond.read(3));
 
@@ -145,11 +149,15 @@ describe('BufferPond', () => {
                 pond.feed(Helper.buffer('22-33-44'));
             }, 100);
 
+            jest.runOnlyPendingTimers();
+
             Helper.equal('11-22', await pond.read(2));
 
             setTimeout(() => {
                 pond.feed(Helper.buffer('55-66'));
             }, 100);
+
+            jest.runOnlyPendingTimers();
 
             Helper.equal('33-44-55', await pond.read(3));
 
