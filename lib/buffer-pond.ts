@@ -1,3 +1,9 @@
+import { Transform } from 'stream';
+
+
+
+
+
 export function BufferPond <T extends Buffer> () {
 
     let sizeCurrent = 0;
@@ -14,6 +20,7 @@ export function BufferPond <T extends Buffer> () {
         feed,
         read,
         rest,
+        transform,
     });
 
 
@@ -77,6 +84,14 @@ export function BufferPond <T extends Buffer> () {
         }
 
         return read(sizeCurrent);
+    }
+
+    function transform
+        <P extends Parameters<typeof Transform.prototype._transform>>
+            (chunk: P[0], _encoding: P[1], callback: P[2]) {
+
+        feed(chunk);
+        setImmediate(callback);
     }
 
 }
