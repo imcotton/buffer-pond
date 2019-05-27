@@ -177,6 +177,54 @@ describe('BufferPond', () => {
     });
 
 
+
+    describe('Destroy', () => {
+
+        let pond: ReturnType<typeof BufferPond>;
+
+
+
+        beforeEach(() => {
+            pond = BufferPond();
+        });
+
+
+
+        test('from beginning', () => {
+
+            pond.destroy();
+
+            const hook = jest.fn();
+
+            pond.feed(Helper.buffer('11-22-33'));
+            pond.read(2, hook);
+
+            expect(hook).not.toHaveBeenCalled();
+
+        });
+
+        test('in middle', () => {
+
+            pond.feed(Helper.buffer('11-22-33-44-55-66'));
+
+            pond.read(2, () => {
+
+                pond.destroy();
+
+                const hook = jest.fn();
+
+                pond.read(2, hook);
+
+                expect(hook).not.toHaveBeenCalled();
+
+            });
+
+        });
+
+    });
+
+
+
     describe('Transform Callback', () => {
 
         let pond: ReturnType<typeof BufferPond>;
