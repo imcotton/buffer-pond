@@ -14,6 +14,8 @@ export function BufferPond <T extends Buffer> () {
     /* istanbul ignore next */ // tslint:disable-next-line:no-unused-expression
     let resolve = (chunk: T) => { chunk; };
 
+    let destroyed = false;
+
 
 
     return Object.freeze({
@@ -21,11 +23,16 @@ export function BufferPond <T extends Buffer> () {
         read,
         rest,
         transform,
+        destroy,
     });
 
 
 
     function feed (chunk: T) {
+
+        if (destroyed === true) {
+            return;
+        }
 
         store.push(chunk);
         sizeCurrent += chunk.length;
@@ -54,6 +61,10 @@ export function BufferPond <T extends Buffer> () {
     }
 
     function sync () {
+
+        if (destroyed === true) {
+            return;
+        }
 
         if (sizeWanted < 1 || sizeCurrent < sizeWanted) {
             return;
@@ -92,6 +103,11 @@ export function BufferPond <T extends Buffer> () {
 
         feed(chunk);
         setImmediate(callback);
+    }
+
+    function destroy () {
+        store.length = sizeWanted = sizeCurrent = 0;
+        destroyed = true;
     }
 
 }
