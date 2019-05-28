@@ -4,6 +4,8 @@ import { Transform } from 'stream';
 
 
 
+export type IBufferPond = ReturnType<typeof BufferPond>;
+
 export function BufferPond <T extends Buffer> () {
 
     let sizeCurrent = 0;
