@@ -33,9 +33,17 @@ action "Test" {
   args = "test"
 }
 
+action "Coverage" {
+  uses = "docker://node:10"
+  needs = "Test"
+  runs = "npx"
+  args = "codecov"
+  secrets = ["CODECOV_TOKEN"]
+}
+
 action "Tag Check: version" {
   uses = "actions/bin/filter@master"
-  needs = ["Build", "Test"]
+  needs = ["Build", "Coverage"]
   args = "tag v/*"
 }
 
