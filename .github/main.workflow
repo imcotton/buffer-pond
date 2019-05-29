@@ -1,6 +1,6 @@
 workflow "Check" {
   on = "push"
-  resolves = ["Build", "Coverage"]
+  resolves = ["Coverage", "Build"]
 }
 
 workflow "Publish" {
@@ -43,7 +43,7 @@ action "Coverage" {
 
 action "Tag Check: version" {
   uses = "actions/bin/filter@master"
-  needs = ["Build", "Test"]
+  needs = ["Test", "Build"]
   args = "tag v/*"
 }
 
