@@ -14,27 +14,27 @@ workflow "Tag Latest" {
 }
 
 action "Install" {
-  uses = "docker://node:10"
+  uses = "docker://node:12"
   runs = "npm"
   args = "install"
 }
 
 action "Build" {
-  uses = "docker://node:10"
+  uses = "docker://node:12"
   needs = "Install"
   runs = "npm"
   args = "run build"
 }
 
 action "Test" {
-  uses = "docker://node:10"
+  uses = "docker://node:12"
   needs = "Install"
   runs = "npm"
   args = "test"
 }
 
 action "Coverage" {
-  uses = "docker://node:10"
+  uses = "docker://node:12"
   needs = "Test"
   runs = "npx"
   args = "codecov"
