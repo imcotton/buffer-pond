@@ -1,3 +1,5 @@
+export type IAsyncReadable = ReturnType<typeof AsyncReadable>;
+
 export function AsyncReadable <T extends Buffer> (stream: NodeJS.ReadableStream) {
 
     let next = 0;
