@@ -1,6 +1,8 @@
+type ReadableStream = Pick<NodeJS.ReadableStream, 'on' | 'off' | 'read'>;
+
 export type IAsyncReadable = ReturnType<typeof AsyncReadable>;
 
-export function AsyncReadable <T extends Buffer> (stream: NodeJS.ReadableStream) {
+export function AsyncReadable <T extends Buffer> (stream: ReadableStream) {
 
     let next = 0;
 
