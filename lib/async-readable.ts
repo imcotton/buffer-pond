@@ -18,9 +18,16 @@ export function AsyncReadable <T extends Buffer> (stream: ReadableStream) {
         read (size: number) {
 
             return new Promise<T>(res => {
+
+                if (Boolean(size) === false || size < 1) {
+                    throw new RangeError(`Invalid size: ${ size }`);
+                }
+
                 next = size;
                 resolve = res;
+
                 onReadable();
+
             });
 
         },
@@ -35,13 +42,9 @@ export function AsyncReadable <T extends Buffer> (stream: ReadableStream) {
 
     function onReadable () {
 
-        if (next < 1) {
-            return;
-        }
-
         const data = stream.read(next) as T | null;
 
-        if (data) {
+        if (data !== null && data !== undefined) {
             next = 0;
             resolve(data);
         }
