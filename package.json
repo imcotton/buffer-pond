@@ -4,7 +4,6 @@
   "description": "Slicing buffered chunks in advanced.",
   "main": "dist/index.cjs",
   "module": "dist/index.mjs",
-  "browser": "dist/bundle.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rollup -c && tsc --emitDeclarationOnly",
