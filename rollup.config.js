@@ -32,8 +32,6 @@ export default {
             typescript: require('typescript'),
         }),
 
-        require('rollup-plugin-terser').terser(),
-
     ],
 
 };
