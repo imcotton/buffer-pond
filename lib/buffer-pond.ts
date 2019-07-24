@@ -1,6 +1,6 @@
 /// <reference lib="es2018.asynciterable" />
 
-import { Transform } from 'stream';
+import { Transform, TransformOptions as Opts } from 'stream';
 
 
 
@@ -8,13 +8,13 @@ import { Transform } from 'stream';
 
 export type Gen <T> = (pond: Pick<IBufferPond, 'read'>) => AsyncIterableIterator<T>;
 
-export function toTransform <T> (gen: Gen<T>, readableObjectMode = true) {
+export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode: true }) {
 
-    const { read, transform } = BufferPond();
+    const { read, transform, destroy } = BufferPond();
 
     const pipe = new Transform({
+        ...opts,
         transform,
-        readableObjectMode,
     });
 
     (async function () {
@@ -28,6 +28,7 @@ export function toTransform <T> (gen: Gen<T>, readableObjectMode = true) {
             }
 
         } catch (error) {
+            destroy();
             pipe.destroy(error);
         }
 
