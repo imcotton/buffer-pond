@@ -1,6 +1,41 @@
+/// <reference lib="es2018.asynciterable" />
+
 import { Transform } from 'stream';
 
 
+
+
+
+export type Gen <T> = (pond: Pick<IBufferPond, 'read'>) => AsyncIterableIterator<T>;
+
+export function toTransform <T> (gen: Gen<T>, readableObjectMode = true) {
+
+    const { read, transform } = BufferPond();
+
+    const pipe = new Transform({
+        transform,
+        readableObjectMode,
+    });
+
+    (async function () {
+
+        try {
+
+            while (true) {
+                for await (const chunk of gen({ read })) {
+                    pipe.push(chunk);
+                }
+            }
+
+        } catch (error) {
+            pipe.destroy(error);
+        }
+
+    }());
+
+    return pipe;
+
+}
 
 
 
