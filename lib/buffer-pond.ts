@@ -10,31 +10,35 @@ export type Gen <T> = (pond: Pick<IBufferPond, 'read'>) => AsyncIterableIterator
 
 export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode: true }) {
 
-    const { read, transform, destroy } = BufferPond();
+    return function () {
 
-    const pipe = new Transform({
-        ...opts,
-        transform,
-    });
+        const { read, transform, destroy } = BufferPond();
 
-    (async function () {
+        const pipe = new Transform({
+            ...opts,
+            transform,
+        });
 
-        try {
+        (async function () {
 
-            while (true) {
-                for await (const chunk of gen({ read })) {
-                    pipe.push(chunk);
+            try {
+
+                while (true) {
+                    for await (const chunk of gen({ read })) {
+                        pipe.push(chunk);
+                    }
                 }
+
+            } catch (error) {
+                destroy();
+                pipe.destroy(error);
             }
 
-        } catch (error) {
-            destroy();
-            pipe.destroy(error);
-        }
+        }());
 
-    }());
+        return pipe;
 
-    return pipe;
+    };
 
 }
 
