@@ -2,7 +2,7 @@ import { Transform, Readable, Writable, pipeline } from 'stream';
 
 import { curry } from '@typed/curry';
 
-import { BufferPond } from '../lib/buffer-pond';
+import { bufferPond as BufferPond, toTransform } from '../lib/buffer-pond';
 
 
 
@@ -282,6 +282,87 @@ describe('BufferPond', () => {
 
                     Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
 
+                    done();
+                }
+            );
+
+        }, TIMEOUT);
+
+    });
+
+
+
+    describe('Transform Class', () => {
+
+        let readable: Readable;
+        let writable: Writable;
+
+        let result: Buffer[];
+
+        beforeEach(() => {
+
+            readable = new Readable({
+                read () {
+                    this.push(Helper.buffer('11-22-33-44-55-66'));
+                    this.push(null);
+                }
+            });
+
+            result = [] as Buffer[];
+
+            writable = new Writable({
+                write (chunk, _encoding, callback) {
+                    result.push(chunk);
+                    callback();
+                }
+            });
+
+        });
+
+
+        test('toTransform', done => {
+
+            const trans = toTransform(async function* ({ read }) {
+
+                yield read(2);
+                yield read(1);
+
+            });
+
+            pipeline(
+                readable,
+                trans(),
+                writable,
+
+                err => {
+                    expect(err).toBeUndefined();
+
+                    Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
+
+                    done();
+                }
+            );
+
+        }, TIMEOUT);
+
+
+
+        test('toTransform with error', done => {
+
+            const trans = toTransform(async function* ({ read }) {
+
+                yield read(2);
+                throw new TypeError('read error');
+
+            });
+
+            pipeline(
+                readable,
+                trans(),
+                writable,
+
+                err => {
+                    expect(err).toBeInstanceOf(TypeError);
                     done();
                 }
             );
