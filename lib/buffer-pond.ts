@@ -12,7 +12,7 @@ export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode:
 
     return function () {
 
-        const { read, transform, destroy } = BufferPond();
+        const { read, transform, destroy } = bufferPond();
 
         const pipe = new Transform({
             ...opts,
@@ -44,9 +44,11 @@ export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode:
 
 
 
-export type IBufferPond = ReturnType<typeof BufferPond>;
+export const BufferPond = bufferPond;
 
-export function BufferPond <T extends Buffer> () {
+export type IBufferPond = ReturnType<typeof bufferPond>;
+
+export function bufferPond <T extends Buffer> () {
 
     let sizeCurrent = 0;
     let sizeWanted = 0;
