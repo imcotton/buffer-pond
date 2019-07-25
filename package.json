@@ -25,13 +25,13 @@
   "devDependencies": {
     "@typed/curry": "^1.0.1",
     "@types/jest": "^24.0.15",
-    "@types/node": "^10.14.7",
+    "@types/node": "^12.6.8",
     "jest": "^24.8.0",
-    "jest-junit": "^6.4.0",
-    "rollup": "^1.16.2",
+    "jest-junit": "^7.0.0",
+    "rollup": "^1.17.0",
     "rollup-plugin-typescript": "^1.0.1",
     "ts-jest": "^24.0.2",
     "tslib": "^1.10.0",
-    "typescript": "^3.5.2"
+    "typescript": "~3.5.3"
   }
 }
