@@ -1,6 +1,6 @@
 {
   "name": "buffer-pond",
-  "version": "0.6.0",
+  "version": "0.7.0-0",
   "description": "Slicing buffered chunks in advanced.",
   "type": "module",
   "main": "dist/index.cjs",
