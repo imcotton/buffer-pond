@@ -19,7 +19,7 @@ export default {
         },
     ],
 
-    external: 'buffer'.split('|'),
+    external: 'buffer|stream'.split('|'),
 
     plugins: [
 
