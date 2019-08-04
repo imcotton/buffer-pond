@@ -2,6 +2,8 @@
 
 import { DuplexOptions as Opts, Duplex } from 'stream';
 
+import { reader } from 'async-readable';
+
 
 
 
@@ -14,49 +16,13 @@ export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode:
 
         const { read, write, pending, destroy } = bufferPond();
 
-        const iterator = gen({ read })[Symbol.asyncIterator]();
-
-        let reading = false;
-
         return new Duplex({
 
             ...opts,
 
             write,
 
-            async read () {
-
-                if (reading) {
-                    return;
-                }
-
-                reading = true;
-
-                try {
-
-                    while (true) {
-
-                        const { value, done } = await iterator.next();
-
-                        if (done) {
-                            break;
-                        }
-
-                        if (this.push(value) === false) {
-                            reading = false;
-                            return;
-                        }
-
-                    }
-
-                    this.push(null);
-
-                } catch (error) {
-                    destroy();
-                    this.destroy(error);
-                }
-
-            },
+            read: reader(gen({ read }), destroy),
 
             final (callback) {
 

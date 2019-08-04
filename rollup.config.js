@@ -25,5 +25,9 @@ export default {
 
     external: 'buffer|stream'.split('|'),
 
+    plugins: [
+        require('rollup-plugin-node-resolve')(),
+    ],
+
 };
 
