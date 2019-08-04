@@ -6,7 +6,7 @@ import { DuplexOptions as Opts, Duplex } from 'stream';
 
 
 
-export type Gen <T> = (pond: Pick<IBufferPond, 'read'>) => AsyncIterable<T>;
+export type Gen <T> = (pond: Pick<BufferPond, 'read'>) => AsyncIterable<T>;
 
 export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode: true }) {
 
@@ -81,9 +81,7 @@ export function noop () {
 
 
 
-export const BufferPond = bufferPond;
-
-export type IBufferPond = ReturnType<typeof bufferPond>;
+export type BufferPond = ReturnType<typeof bufferPond>;
 
 export function bufferPond <T extends Buffer> () {
 

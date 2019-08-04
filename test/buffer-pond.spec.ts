@@ -2,7 +2,7 @@ import { Readable, Writable, pipeline } from 'stream';
 
 import { curry } from '@typed/curry';
 
-import { bufferPond as BufferPond, toTransform } from '../lib/buffer-pond';
+import { bufferPond, BufferPond, toTransform } from '../lib/buffer-pond';
 
 
 
@@ -15,19 +15,19 @@ const TIMEOUT = 500;
 describe('BufferPond', () => {
 
     test('import', () => {
-        expect(BufferPond).toBeDefined();
+        expect(bufferPond).toBeDefined();
     });
 
 
 
     describe('Callback', () => {
 
-        let pond: ReturnType<typeof BufferPond>;
+        let pond: BufferPond;
 
 
 
         beforeEach(() => {
-            pond = BufferPond();
+            pond = bufferPond();
         });
 
 
@@ -111,12 +111,12 @@ describe('BufferPond', () => {
 
         jest.useFakeTimers();
 
-        let pond: ReturnType<typeof BufferPond>;
+        let pond: BufferPond;
 
 
 
         beforeEach(() => {
-            pond = BufferPond();
+            pond = bufferPond();
         });
 
 
@@ -180,12 +180,12 @@ describe('BufferPond', () => {
 
     describe('Destroy', () => {
 
-        let pond: ReturnType<typeof BufferPond>;
+        let pond: BufferPond;
 
 
 
         beforeEach(() => {
-            pond = BufferPond();
+            pond = bufferPond();
         });
 
 
