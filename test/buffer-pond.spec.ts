@@ -305,6 +305,43 @@ describe('BufferPond', () => {
 
 
 
+        test('toTransform with internal drain', done => {
+
+            const iterator = (function* () {
+                yield Helper.buffer('11');
+                yield Helper.buffer('22');
+                yield Helper.buffer('33-44-55-66');
+            }());
+
+            readable = new Readable({
+                read () {
+                    this.push(iterator.next().value);
+                },
+            });
+
+            const trans = toTransform(async function* ({ read }) {
+                yield read(4);
+                yield read(2);
+            });
+
+            pipeline(
+                readable,
+                trans(),
+                writable,
+
+                err => {
+                    expect(err).toBeUndefined();
+
+                    Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
+
+                    done();
+                },
+            );
+
+        }, TIMEOUT);
+
+
+
         test('toTransform with error', done => {
 
             const trans = toTransform(async function* ({ read }) {
