@@ -1,14 +1,15 @@
 {
   "name": "buffer-pond",
-  "version": "0.6.0",
+  "version": "0.7.0-1",
   "description": "Slicing buffered chunks in advanced.",
-  "type": "module",
-  "main": "dist/index.cjs",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "module": "index.mjs",
+  "types": "index.d.ts",
+  "sideEffects": false,
   "scripts": {
-    "build": "rollup -c && tsc --emitDeclarationOnly",
-    "versions": "node -p \"require('./package.json').version\"",
+    "prepublishOnly": "mv ./dist/* ./",
+    "build": "tsc && rollup -c",
+    "ver": "echo ${npm_package_name}@${npm_package_version}",
     "test": "jest --ci --coverage"
   },
   "keywords": [
@@ -25,11 +26,12 @@
   "devDependencies": {
     "@typed/curry": "^1.0.1",
     "@types/jest": "^24.0.15",
-    "@types/node": "^12.6.8",
+    "@types/node": "^10.14.14",
+    "async-readable": "~0.2.0",
     "jest": "^24.8.0",
     "jest-junit": "^7.0.0",
     "rollup": "^1.17.0",
-    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-node-resolve": "^5.2.0",
     "ts-jest": "^24.0.2",
     "tslib": "^1.10.0",
     "typescript": "~3.5.3"

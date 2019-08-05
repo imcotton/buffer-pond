@@ -1,42 +1,40 @@
 /// <reference lib="es2018.asynciterable" />
 
-import { Transform, TransformOptions as Opts } from 'stream';
+import { DuplexOptions as Opts, Duplex } from 'stream';
+
+import { reader } from 'async-readable';
 
 
 
 
 
-export type Gen <T> = (pond: Pick<IBufferPond, 'read'>) => AsyncIterableIterator<T>;
+export type Gen <T> = (pond: Pick<BufferPond, 'read'>) => AsyncIterable<T>;
 
 export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode: true }) {
 
     return function () {
 
-        const { read, transform, destroy } = bufferPond();
+        const { read, write, pending, destroy } = bufferPond();
 
-        const pipe = new Transform({
+        return new Duplex({
+
             ...opts,
-            transform,
-        });
 
-        (async function () {
+            write,
 
-            try {
+            read: reader(gen({ read }), destroy),
 
-                while (true) {
-                    for await (const chunk of gen({ read })) {
-                        pipe.push(chunk);
-                    }
+            final (callback) {
+
+                if (pending()) {
+                    destroy();
+                    this.push(null);
+                    setImmediate(callback);
                 }
 
-            } catch (error) {
-                destroy();
-                pipe.destroy(error);
-            }
+            },
 
-        }());
-
-        return pipe;
+        });
 
     };
 
@@ -44,9 +42,12 @@ export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode:
 
 
 
-export const BufferPond = bufferPond;
+export function noop () {
+}
 
-export type IBufferPond = ReturnType<typeof bufferPond>;
+
+
+export type BufferPond = ReturnType<typeof bufferPond>;
 
 export function bufferPond <T extends Buffer> () {
 
@@ -60,28 +61,30 @@ export function bufferPond <T extends Buffer> () {
 
     let destroyed = false;
 
+    let callback = noop;
 
 
     return Object.freeze({
         feed,
         read,
         rest,
-        transform,
+        write,
+        pending,
         destroy,
     });
 
 
 
-    function feed (chunk: T) {
+    function feed (chunk: T): boolean {
 
         if (destroyed === true) {
-            return;
+            return false;
         }
 
         store.push(chunk);
         sizeCurrent += chunk.length;
 
-        sync();
+        return sync();
 
     }
 
@@ -104,14 +107,19 @@ export function bufferPond <T extends Buffer> () {
 
     }
 
-    function sync () {
+    function sync (): boolean {
 
         if (destroyed === true) {
-            return;
+            return false;
         }
 
-        if (sizeWanted < 1 || sizeCurrent < sizeWanted) {
-            return;
+        if (sizeWanted < 1) {
+            return false;
+        }
+
+        if (sizeCurrent < sizeWanted) {
+            drain();
+            return true;
         }
 
         const buffer = Buffer.concat(store);
@@ -128,6 +136,12 @@ export function bufferPond <T extends Buffer> () {
 
         sizeWanted = 0;
 
+        if (sizeCurrent < 1) {
+            drain();
+        }
+
+        return false;
+
     }
 
     function rest (): Promise<T>;
@@ -141,12 +155,25 @@ export function bufferPond <T extends Buffer> () {
         return read(sizeCurrent);
     }
 
-    function transform
-        <P extends Parameters<typeof Transform.prototype._transform>>
-            (chunk: P[0], _encoding: P[1], callback: P[2]) {
+    function write
+        <P extends Parameters<typeof Duplex.prototype._write>>
+            (chunk: P[0], _encoding: P[1], cb: P[2]) {
 
-        feed(chunk);
-        setImmediate(callback);
+        if (feed(chunk) !== true) {
+            callback = cb;
+            return;
+        }
+
+        setImmediate(cb);
+    }
+
+    function pending () {
+        return sizeWanted > 0;
+    }
+
+    function drain () {
+        process.nextTick(callback);
+        callback = noop;
     }
 
     function destroy () {

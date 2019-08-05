@@ -4,29 +4,29 @@ import pkg from './package.json';
 
 
 
+const dist = file => `${ process.env.OUT || './dist' }/${ file }`;
+
+
+
 export default {
 
-    input: './lib/index.ts',
+    input: dist(pkg.main),
 
     output: [
         {
-            file: pkg.main,
+            file: dist(pkg.main),
             format: 'cjs',
         },
         {
-            file: pkg.module,
+            file: dist(pkg.module),
             format: 'esm',
         },
     ],
 
-    external: 'buffer'.split('|'),
+    external: 'buffer|stream'.split('|'),
 
     plugins: [
-
-        require('rollup-plugin-typescript')({
-            typescript: require('typescript'),
-        }),
-
+        require('rollup-plugin-node-resolve')(),
     ],
 
 };

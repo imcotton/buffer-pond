@@ -1,8 +1,8 @@
-import { Transform, Readable, Writable, pipeline } from 'stream';
+import { Readable, Writable, pipeline } from 'stream';
 
 import { curry } from '@typed/curry';
 
-import { bufferPond as BufferPond, toTransform } from '../lib/buffer-pond';
+import { bufferPond, BufferPond, toTransform } from '../lib/buffer-pond';
 
 
 
@@ -15,19 +15,19 @@ const TIMEOUT = 500;
 describe('BufferPond', () => {
 
     test('import', () => {
-        expect(BufferPond).toBeDefined();
+        expect(bufferPond).toBeDefined();
     });
 
 
 
     describe('Callback', () => {
 
-        let pond: ReturnType<typeof BufferPond>;
+        let pond: BufferPond;
 
 
 
         beforeEach(() => {
-            pond = BufferPond();
+            pond = bufferPond();
         });
 
 
@@ -111,12 +111,12 @@ describe('BufferPond', () => {
 
         jest.useFakeTimers();
 
-        let pond: ReturnType<typeof BufferPond>;
+        let pond: BufferPond;
 
 
 
         beforeEach(() => {
-            pond = BufferPond();
+            pond = bufferPond();
         });
 
 
@@ -180,12 +180,12 @@ describe('BufferPond', () => {
 
     describe('Destroy', () => {
 
-        let pond: ReturnType<typeof BufferPond>;
+        let pond: BufferPond;
 
 
 
         beforeEach(() => {
-            pond = BufferPond();
+            pond = bufferPond();
         });
 
 
@@ -225,79 +225,14 @@ describe('BufferPond', () => {
 
 
 
-    describe('Transform Callback', () => {
-
-        let pond: ReturnType<typeof BufferPond>;
-
-
-
-        beforeEach(() => {
-            pond = BufferPond();
-        });
-
-
-
-        test('transform through', done => {
-
-            const readable = new Readable({
-                read () {
-                    this.push(Helper.buffer('11-22-44-55'));
-                    this.push(null);
-                }
-            });
-
-
-
-            const { transform, read } = pond;
-            const trans = new Transform({ transform });
-
-            read(2, chunk => {
-                trans.push(Buffer.concat([ chunk, Helper.buffer('33') ]));
-
-                read(2, chunk => {
-                    trans.push(Buffer.concat([ chunk, Helper.buffer('66') ]));
-                });
-            });
-
-
-
-            const result = [] as Buffer[];
-
-            const writable = new Writable({
-                write (chunk, _encoding, callback) {
-                    result.push(chunk);
-                    callback();
-                }
-            });
-
-
-
-            pipeline(
-                readable,
-                trans,
-                writable,
-
-                err => {
-                    expect(err).toBeUndefined();
-
-                    Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
-
-                    done();
-                }
-            );
-
-        }, TIMEOUT);
-
-    });
-
-
-
-    describe('Transform Class', () => {
+    describe('The toTransform', () => {
 
         let readable: Readable;
         let writable: Writable;
 
         let result: Buffer[];
+
+
 
         beforeEach(() => {
 
@@ -305,7 +240,7 @@ describe('BufferPond', () => {
                 read () {
                     this.push(Helper.buffer('11-22-33-44-55-66'));
                     this.push(null);
-                }
+                },
             });
 
             result = [] as Buffer[];
@@ -314,19 +249,18 @@ describe('BufferPond', () => {
                 write (chunk, _encoding, callback) {
                     result.push(chunk);
                     callback();
-                }
+                },
             });
 
         });
 
 
+
         test('toTransform', done => {
 
             const trans = toTransform(async function* ({ read }) {
-
-                yield read(2);
-                yield read(1);
-
+                yield read(3);
+                yield read(3);
             });
 
             pipeline(
@@ -340,12 +274,70 @@ describe('BufferPond', () => {
                     Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
 
                     done();
-                }
+                },
             );
 
         }, TIMEOUT);
 
+        test('toTransform loop', done => {
 
+            const trans = toTransform(async function* ({ read }) {
+                while (true) {
+                    yield read(2);
+                    yield read(1);
+                }
+            });
+
+            pipeline(
+                readable,
+                trans(),
+                writable,
+
+                err => {
+                    expect(err).toBeUndefined();
+
+                    Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
+
+                    done();
+                },
+            );
+
+        }, TIMEOUT);
+
+        test('toTransform with internal drain', done => {
+
+            const iterator = (function* () {
+                yield Helper.buffer('11');
+                yield Helper.buffer('22');
+                yield Helper.buffer('33-44-55-66');
+            }());
+
+            readable = new Readable({
+                read () {
+                    this.push(iterator.next().value);
+                },
+            });
+
+            const trans = toTransform(async function* ({ read }) {
+                yield read(4);
+                yield read(2);
+            });
+
+            pipeline(
+                readable,
+                trans(),
+                writable,
+
+                err => {
+                    expect(err).toBeUndefined();
+
+                    Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
+
+                    done();
+                },
+            );
+
+        }, TIMEOUT);
 
         test('toTransform with error', done => {
 
@@ -364,7 +356,7 @@ describe('BufferPond', () => {
                 err => {
                     expect(err).toBeInstanceOf(TypeError);
                     done();
-                }
+                },
             );
 
         }, TIMEOUT);
