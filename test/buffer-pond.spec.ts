@@ -232,13 +232,15 @@ describe('BufferPond', () => {
 
         let result: Buffer[];
 
+
+
         beforeEach(() => {
 
             readable = new Readable({
                 read () {
                     this.push(Helper.buffer('11-22-33-44-55-66'));
                     this.push(null);
-                }
+                },
             });
 
             result = [] as Buffer[];
@@ -247,10 +249,11 @@ describe('BufferPond', () => {
                 write (chunk, _encoding, callback) {
                     result.push(chunk);
                     callback();
-                }
+                },
             });
 
         });
+
 
 
         test('toTransform', done => {
@@ -271,12 +274,10 @@ describe('BufferPond', () => {
                     Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
 
                     done();
-                }
+                },
             );
 
         }, TIMEOUT);
-
-
 
         test('toTransform loop', done => {
 
@@ -298,12 +299,10 @@ describe('BufferPond', () => {
                     Helper.equal('11-22-33-44-55-66', Buffer.concat(result));
 
                     done();
-                }
+                },
             );
 
         }, TIMEOUT);
-
-
 
         test('toTransform with internal drain', done => {
 
@@ -340,8 +339,6 @@ describe('BufferPond', () => {
 
         }, TIMEOUT);
 
-
-
         test('toTransform with error', done => {
 
             const trans = toTransform(async function* ({ read }) {
@@ -359,7 +356,7 @@ describe('BufferPond', () => {
                 err => {
                     expect(err).toBeInstanceOf(TypeError);
                     done();
-                }
+                },
             );
 
         }, TIMEOUT);
