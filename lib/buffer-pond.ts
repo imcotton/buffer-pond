@@ -10,9 +10,9 @@ import { reader } from 'async-readable';
 
 export type Gen <T> = (pond: Pick<BufferPond, 'read'>) => AsyncIterable<T>;
 
-export function toTransform <T> (gen: Gen<T>, opts: Opts = { readableObjectMode: true }) {
+export function toTransform <T> (gen: Gen<T>) {
 
-    return function () {
+    return function (opts: Opts = { readableObjectMode: true }) {
 
         const { read, write, pending, destroy } = bufferPond();
 
