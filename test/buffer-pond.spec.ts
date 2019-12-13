@@ -32,29 +32,24 @@ describe('BufferPond', () => {
 
 
 
-        test('demand under supply', () => {
+        test('demand under supply', async () => {
 
             pond.feed(Helper.buffer('11-22-33-44-55-66'));
 
-            pond.read(2, data => {
-
-                Helper.equal('11-22', data);
-
-                pond.read(3, Helper.equal('33-44-55'));
-
-            })
+            Helper.equal('11-22', await pond.read(2));
+            Helper.equal('33-44-55', await pond.read(3));
 
         });
 
         test('demand above supply', () => {
 
-            pond.read(2, data => {
+            pond.read(2).then(data => {
 
                 Helper.equal('11-22', data);
 
-                pond.read(3, Helper.equal('33-44-55'));
+                pond.read(3).then(Helper.equal('33-44-55'));
 
-            })
+            });
 
             pond.feed(Helper.buffer('11-22-33-44-55-66'));
 
@@ -64,11 +59,11 @@ describe('BufferPond', () => {
 
             pond.feed(Helper.buffer('11'));
 
-            pond.read(2, data => {
+            pond.read(2).then(data => {
 
                 Helper.equal('11-22', data);
 
-                pond.read(3, Helper.equal('33-44-55'));
+                pond.read(3).then(Helper.equal('33-44-55'));
 
                 pond.feed(Helper.buffer('55-66'));
 
@@ -82,11 +77,11 @@ describe('BufferPond', () => {
 
             pond.feed(Helper.buffer('11-22-33-44-55-66'));
 
-            pond.read(2, data => {
+            pond.read(2).then(data => {
 
                 Helper.equal('11-22', data);
 
-                pond.rest(Helper.equal('33-44-55-66'));
+                pond.rest().then(Helper.equal('33-44-55-66'));
 
             })
 
@@ -97,7 +92,7 @@ describe('BufferPond', () => {
             const hook = jest.fn();
 
             pond.feed(Helper.buffer('11-22-33-44-55-66'));
-            pond.read(-2, hook);
+            pond.read(-2).then(hook);
 
             expect(hook).not.toHaveBeenCalled();
 
@@ -197,7 +192,7 @@ describe('BufferPond', () => {
             const hook = jest.fn();
 
             pond.feed(Helper.buffer('11-22-33'));
-            pond.read(2, hook);
+            pond.read(2).then(hook);
 
             expect(hook).not.toHaveBeenCalled();
 
@@ -207,13 +202,13 @@ describe('BufferPond', () => {
 
             pond.feed(Helper.buffer('11-22-33-44-55-66'));
 
-            pond.read(2, () => {
+            pond.read(2).then(() => {
 
                 pond.destroy();
 
                 const hook = jest.fn();
 
-                pond.read(2, hook);
+                pond.read(2).then(hook);
 
                 expect(hook).not.toHaveBeenCalled();
 
