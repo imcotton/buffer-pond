@@ -88,17 +88,9 @@ export function bufferPond <T extends Buffer> () {
 
     }
 
-    function read (size: number): Promise<T>;
-    function read (size: number, cb: typeof resolve): void;
-    function read (size: number, cb?: typeof resolve) {
+    function read (size: number) {
 
         sizeWanted = size;
-
-        if (typeof cb === 'function') {
-            resolve = cb;
-            sync();
-            return;
-        }
 
         return new Promise<T>(res => {
             resolve = res;
@@ -144,14 +136,7 @@ export function bufferPond <T extends Buffer> () {
 
     }
 
-    function rest (): Promise<T>;
-    function rest (cb: typeof resolve): void;
-    function rest (cb?: typeof resolve) {
-
-        if (typeof cb === 'function') {
-            return read(sizeCurrent, cb);
-        }
-
+    function rest () {
         return read(sizeCurrent);
     }
 
