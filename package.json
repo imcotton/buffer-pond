@@ -16,7 +16,6 @@
     "buffer",
     "async"
   ],
-  "author": "Cotton Hou <himcotton@gmail.com>",
   "repository": "imcotton/buffer-pond",
   "homepage": "https://github.com/imcotton/buffer-pond#readme",
   "bugs": {
