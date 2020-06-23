@@ -121,10 +121,10 @@ export function bufferPond <T extends Buffer> () {
         store.length = 0;
 
         if (sizeCurrent > 0) {
-            store.push(buffer.slice(sizeWanted) as T);
+            store.push(buffer.subarray(sizeWanted) as T);
         }
 
-        resolve(buffer.slice(0, sizeWanted) as T);
+        resolve(buffer.subarray(0, sizeWanted) as T);
 
         sizeWanted = 0;
 
