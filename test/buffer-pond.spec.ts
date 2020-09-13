@@ -256,6 +256,7 @@ describe('BufferPond', () => {
             const trans = toTransform(async function* ({ read }) {
                 yield read(3);
                 yield read(3);
+                yield read(1);
             });
 
             pipeline(
@@ -309,13 +310,15 @@ describe('BufferPond', () => {
 
             readable = new Readable({
                 read () {
-                    this.push(iterator.next().value);
+                    const { value, done } = iterator.next();
+                    this.push(done ? null : value);
                 },
             });
 
             const trans = toTransform(async function* ({ read }) {
                 yield read(4);
                 yield read(2);
+                yield read(1);
             });
 
             pipeline(
