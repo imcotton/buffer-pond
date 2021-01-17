@@ -64,14 +64,14 @@ export function bufferPond <T extends Buffer> () {
     let callback = noop;
 
 
-    return Object.freeze({
+    return {
         feed,
         read,
         rest,
         write,
         pending,
         destroy,
-    });
+    };
 
 
 
